@@ -13,7 +13,7 @@ const SignUp = ({ isLogin: initialIsLogin = false }) => {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [isLogin, setIsLogin] = useState(initialIsLogin); // Use the prop as initial state
   const [error, setError] = useState(''); // State for storing error messages
-  const [userType, setUserType] = useState('student'); // student or professional
+  const [userType, setUserType] = useState('professional'); // student or professional
   const [organization, setOrganization] = useState(''); // Organization name if professional
   const [linkdedin, setLinkedin] = useState(''); // Organization name if professional
   const [domains, setDomains] = useState([]); // Array to hold the selected domains
