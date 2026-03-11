@@ -158,7 +158,7 @@ const SignUp = ({ isLogin: initialIsLogin = false }) => {
         console.log('User registered in Firebase:', { email });
   
         // Handle additional user info based on user type
-        if (userType === 'professional' && organization && domains.length > 0 && linkdedin) {
+        if ((userType === ('professional'||'student')) && organization && domains.length > 0 && linkdedin) {
           console.log('User is a professional:', { organization, domains });
           const response = await fetch('https://critiquebackend.onrender.com/user/signup', {
             method: 'POST',
