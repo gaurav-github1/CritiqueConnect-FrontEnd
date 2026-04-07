@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
 import Navbar from './Navbar';
+import Footer from './Footer';
+import { motion, AnimatePresence } from 'framer-motion';
 
 const ReviewsPage = () => {
   const [activeTab, setActiveTab] = useState('all');
 
-  // Example review data
   const reviews = [
     {
       id: 1,
@@ -57,175 +58,116 @@ const ReviewsPage = () => {
     ? reviews 
     : reviews.filter(review => review.category === activeTab);
 
-  // Helper to render stars based on rating
   const renderStars = (rating) => {
-    const stars = [];
-    for (let i = 1; i <= 5; i++) {
-      stars.push(
-        <svg 
-          key={i}
-          className={`w-5 h-5 ${i <= rating ? 'text-yellow-400' : 'text-gray-300'}`}
-          fill="currentColor" 
-          viewBox="0 0 20 20"
-        >
-          <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-        </svg>
-      );
-    }
-    return stars;
+    return [...Array(5)].map((_, i) => (
+      <svg key={i} className={`w-4 h-4 ${i < rating ? 'text-[#22d3ee]' : 'text-gray-600'}`} fill="currentColor" viewBox="0 0 20 20">
+        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+      </svg>
+    ));
   };
+
+  const tabs = ['all', 'technology', 'business', 'social'];
 
   return (
     <>
       <Navbar />
-      <div className="bg-gradient-to-br from-indigo-50 to-purple-100 min-h-screen pt-24 pb-16">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-12">
-            <h1 className="text-4xl font-extrabold text-gray-900 sm:text-5xl sm:tracking-tight lg:text-6xl mb-6">
-              <span className="bg-clip-text text-transparent bg-gradient-to-r from-indigo-500 to-purple-600">
-                Customer Reviews
-              </span>
-            </h1>
-            <p className="max-w-xl mx-auto text-xl text-gray-600">
-              See what our users are saying about their experience with CritiqueConnect.
-            </p>
+      <div className="bg-[#050505] min-h-screen pt-32 pb-16 font-ui relative overflow-hidden">
+        {/* Background Grid */}
+        <div className="absolute inset-0 opacity-[0.03] pointer-events-none" style={{ backgroundImage: 'linear-gradient(to right, #fff 1px, transparent 1px), linear-gradient(to bottom, #fff 1px, transparent 1px)', backgroundSize: '40px 40px' }} />
+        
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+          <div className="text-center mb-16">
+            <motion.h1 initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} className="text-4xl md:text-5xl font-bold text-white mb-4">
+              Community <span className="text-[#22d3ee]">Testimonials</span>
+            </motion.h1>
+            <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.1 }} className="text-gray-400 max-w-xl mx-auto">
+              Real feedback from real professionals using the CritiqueConnect platform to elevate their craft.
+            </motion.p>
           </div>
 
-          {/* Rating Overview */}
-          <div className="bg-white rounded-2xl shadow-xl mb-12 overflow-hidden">
-            <div className="p-8">
-              <div className="flex flex-col md:flex-row items-center justify-between">
-                <div className="mb-6 md:mb-0 flex flex-col items-center md:items-start">
-                  <h2 className="text-3xl font-bold text-gray-900 mb-2">4.8</h2>
-                  <div className="flex space-x-1 mb-2">
-                    {renderStars(5)}
-                  </div>
-                  <p className="text-gray-600">Based on 48 reviews</p>
-                </div>
-                
-                <div className="w-full md:w-2/3">
-                  {/* Rating Bars */}
-                  <div className="space-y-3">
-                    {[5, 4, 3, 2, 1].map((num) => (
-                      <div key={num} className="flex items-center">
-                        <div className="flex items-center w-28">
-                          <span className="text-sm font-medium text-gray-600 mr-2">{num} stars</span>
-                          <div className="flex space-x-1">
-                            {renderStars(num)}
-                          </div>
-                        </div>
-                        <div className="w-full bg-gray-200 rounded-full h-2.5 ml-2">
-                          <div 
-                            className="bg-indigo-600 h-2.5 rounded-full" 
-                            style={{ width: `${num === 5 ? 70 : num === 4 ? 20 : num === 3 ? 7 : num === 2 ? 2 : 1}%` }}
-                          ></div>
-                        </div>
-                        <span className="text-sm font-medium text-gray-600 w-10 text-right">
-                          {num === 5 ? 70 : num === 4 ? 20 : num === 3 ? 7 : num === 2 ? 2 : 1}%
-                        </span>
+          {/* Aggregation Stats */}
+          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }} className="bg-[#0a0a0f] border border-[rgba(255,255,255,0.06)] rounded-2xl shadow-2xl mb-12 p-8 max-w-4xl mx-auto">
+            <div className="flex flex-col md:flex-row items-center justify-between gap-8">
+              <div className="flex flex-col items-center md:items-start text-center md:text-left shrink-0">
+                <h2 className="text-6xl font-bold text-white mb-2">4.8<span className="text-xl text-gray-500">/5</span></h2>
+                <div className="flex space-x-1 mb-2">{renderStars(5)}</div>
+                <p className="text-gray-400 font-mono text-sm uppercase tracking-widest">Global Aggregation</p>
+              </div>
+              
+              <div className="w-full flex-1 space-y-3 border-l-0 md:border-l border-[rgba(255,255,255,0.1)] pl-0 md:pl-8">
+                {[5, 4, 3, 2, 1].map(num => {
+                  const pct = num === 5 ? 70 : num === 4 ? 20 : num === 3 ? 7 : num === 2 ? 2 : 1;
+                  return (
+                    <div key={num} className="flex items-center text-sm">
+                      <span className="font-mono text-gray-400 w-16 shrink-0">{num} STAR</span>
+                      <div className="flex-1 bg-[#12121a] rounded-full h-1.5 mx-4 overflow-hidden">
+                        <motion.div initial={{ width: 0 }} animate={{ width: `${pct}%` }} transition={{ duration: 1, delay: 0.5 }} className="bg-[#22d3ee] h-full rounded-full" />
                       </div>
-                    ))}
-                  </div>
-                </div>
+                      <span className="font-mono text-gray-400 w-10 text-right">{pct}%</span>
+                    </div>
+                  );
+                })}
               </div>
             </div>
-          </div>
+          </motion.div>
 
-          {/* Category Tabs */}
-          <div className="flex justify-center mb-8">
-            <div className="inline-flex p-1 bg-gray-100 rounded-lg">
-              <button 
-                onClick={() => setActiveTab('all')}
-                className={`px-4 py-2 text-sm font-medium rounded-md ${
-                  activeTab === 'all' 
-                    ? 'bg-white text-indigo-600 shadow-sm' 
-                    : 'text-gray-600 hover:text-gray-800'
-                }`}
-              >
-                All Reviews
-              </button>
-              <button 
-                onClick={() => setActiveTab('technology')}
-                className={`px-4 py-2 text-sm font-medium rounded-md ${
-                  activeTab === 'technology' 
-                    ? 'bg-white text-indigo-600 shadow-sm' 
-                    : 'text-gray-600 hover:text-gray-800'
-                }`}
-              >
-                Technology
-              </button>
-              <button 
-                onClick={() => setActiveTab('business')}
-                className={`px-4 py-2 text-sm font-medium rounded-md ${
-                  activeTab === 'business' 
-                    ? 'bg-white text-indigo-600 shadow-sm' 
-                    : 'text-gray-600 hover:text-gray-800'
-                }`}
-              >
-                Business
-              </button>
-              <button 
-                onClick={() => setActiveTab('social')}
-                className={`px-4 py-2 text-sm font-medium rounded-md ${
-                  activeTab === 'social' 
-                    ? 'bg-white text-indigo-600 shadow-sm' 
-                    : 'text-gray-600 hover:text-gray-800'
-                }`}
-              >
-                Social
-              </button>
+          {/* Sliding Filter Tabs */}
+          <div className="flex justify-center mb-12">
+            <div className="inline-flex p-1 bg-[#12121a] border border-[rgba(255,255,255,0.04)] rounded-xl relative">
+              {tabs.map(tab => (
+                <button
+                  key={tab}
+                  onClick={() => setActiveTab(tab)}
+                  className={`relative px-6 py-2.5 text-sm font-mono uppercase tracking-wider rounded-lg z-10 transition-colors ${activeTab === tab ? 'text-[#050505] font-bold' : 'text-gray-400 hover:text-white'}`}
+                >
+                  {activeTab === tab && (
+                    <motion.div layoutId="tab-pill" className="absolute inset-0 bg-[#22d3ee] rounded-lg -z-10" transition={{ type: "spring", stiffness: 300, damping: 20 }} />
+                  )}
+                  {tab}
+                </button>
+              ))}
             </div>
           </div>
 
-          {/* Reviews Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {filteredReviews.map((review) => (
-              <div 
-                key={review.id} 
-                className="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300"
-              >
-                <div className="p-6">
-                  <div className="flex items-center mb-4">
-                    <img 
-                      src={review.avatar} 
-                      alt={review.name}
-                      className="w-12 h-12 rounded-full mr-4"
-                    />
-                    <div>
-                      <h3 className="font-bold text-gray-900">{review.name}</h3>
-                      <div className="flex items-center space-x-2">
-                        <div className="flex">
-                          {renderStars(review.rating)}
-                        </div>
-                        <span className="text-sm text-gray-500">{review.date}</span>
-                      </div>
+          {/* Staggered Grid */}
+          <motion.div layout className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <AnimatePresence mode="popLayout">
+              {filteredReviews.map((review, i) => (
+                <motion.div
+                  layout
+                  initial={{ opacity: 0, scale: 0.8 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0, scale: 0.8 }}
+                  transition={{ type: "spring", stiffness: 300, damping: 25, delay: i * 0.05 }}
+                  key={review.id}
+                  className="bg-[#0a0a0f] border border-[rgba(255,255,255,0.06)] rounded-2xl p-6 hover:border-[#22d3ee]/30 transition-colors group flex flex-col"
+                >
+                  <div className="flex items-center mb-6">
+                    <img src={review.avatar} alt={review.name} className="w-12 h-12 rounded-full border-2 border-[rgba(255,255,255,0.1)] group-hover:border-[#22d3ee]/50 transition-colors" />
+                    <div className="ml-4">
+                      <h3 className="font-bold text-white">{review.name}</h3>
+                      <div className="flex space-x-1 mt-1">{renderStars(review.rating)}</div>
                     </div>
                   </div>
-                  <div>
-                    <span className="inline-block px-3 py-1 mb-3 text-xs font-semibold text-indigo-600 bg-indigo-100 rounded-full capitalize">
+                  <p className="text-gray-400 text-sm leading-relaxed mb-6 flex-1 italic relative">
+                    <span className="absolute -top-3 -left-2 text-4xl text-[rgba(255,255,255,0.05)] font-serif">"</span>
+                    {review.review}
+                  </p>
+                  <div className="flex justify-between items-center mt-auto border-t border-[rgba(255,255,255,0.04)] pt-4">
+                    <span className="px-2 py-1 text-[10px] font-mono uppercase tracking-widest text-[#22d3ee] bg-[#22d3ee]/10 rounded border border-[#22d3ee]/20">
                       {review.category}
                     </span>
-                    <p className="text-gray-600">{review.review}</p>
+                    <span className="text-xs font-mono text-gray-600">{review.date}</span>
                   </div>
-                </div>
-              </div>
-            ))}
-          </div>
-
-          {/* Call to Action */}
-          <div className="mt-16 text-center">
-            <h3 className="text-2xl font-bold text-gray-900 mb-4">Ready to experience it yourself?</h3>
-            <button 
-              onClick={() => window.location.href='/signup'} 
-              className="px-6 py-3 bg-gradient-to-r from-indigo-500 to-purple-600 text-white font-medium rounded-lg shadow hover:shadow-lg transform transition hover:-translate-y-0.5"
-            >
-              Sign Up Now
-            </button>
-          </div>
+                </motion.div>
+              ))}
+            </AnimatePresence>
+          </motion.div>
         </div>
       </div>
+      <Footer />
     </>
   );
 };
 
-export default ReviewsPage; 
+export default ReviewsPage;

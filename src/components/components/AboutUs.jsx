@@ -1,170 +1,147 @@
-import React from 'react';
+import React, { useRef } from 'react';
 import Navbar from './Navbar';
 import Footer from './Footer';
 import avatar from '../assets/images/avatar.jpg';
+import { motion, useMotionValue, useSpring, useTransform, useMotionTemplate } from 'framer-motion';
+
+const TiltCard = ({ member, index }) => {
+  const cardRef = useRef(null);
+  const x = useMotionValue(0);
+  const y = useMotionValue(0);
+  const rotateX = useSpring(useTransform(y, [-100, 100], [10, -10]), { stiffness: 300, damping: 20 });
+  const rotateY = useSpring(useTransform(x, [-100, 100], [-10, 10]), { stiffness: 300, damping: 20 });
+  
+  const handleMouseMove = (e) => {
+    if (!cardRef.current) return;
+    const rect = cardRef.current.getBoundingClientRect();
+    x.set(e.clientX - rect.left - rect.width / 2);
+    y.set(e.clientY - rect.top - rect.height / 2);
+  };
+  
+  const handleMouseLeave = () => {
+    x.set(0); y.set(0);
+  };
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 30 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ delay: index * 0.1, type: "spring" }}
+      className="perspective-[1000px] h-full"
+    >
+      <motion.div
+        ref={cardRef}
+        onMouseMove={handleMouseMove}
+        onMouseLeave={handleMouseLeave}
+        style={{ rotateX, rotateY, transformStyle: "preserve-3d" }}
+        className="bg-[#0a0a0f] border border-[rgba(255,255,255,0.06)] rounded-2xl p-8 h-full flex flex-col hover:border-[#22d3ee]/40 transition-colors group relative"
+      >
+        <div className="absolute inset-0 bg-gradient-to-br from-[#22d3ee]/0 to-[#22d3ee]/0 group-hover:from-[#22d3ee]/5 transition-colors rounded-2xl -z-10"></div>
+        <div style={{ transform: "translateZ(30px)" }} className="flex items-center mb-6">
+          <img src={avatar} alt={member.name} className="w-16 h-16 rounded-full grayscale group-hover:grayscale-0 transition-all border border-[rgba(255,255,255,0.1)] group-hover:border-[#22d3ee]" />
+          <div className="ml-4">
+            <h3 className="text-xl font-bold text-white">{member.name}</h3>
+            <p className="text-[#22d3ee] font-mono text-xs uppercase tracking-widest">{member.role}</p>
+          </div>
+        </div>
+        <p style={{ transform: "translateZ(20px)" }} className="text-gray-400 text-sm leading-relaxed mb-8 flex-1">{member.bio}</p>
+        <div style={{ transform: "translateZ(10px)" }} className="mt-auto">
+          <div className="flex flex-wrap gap-2">
+            {member.expertise.map((skill, i) => (
+              <span key={i} className="px-2 py-1 text-[10px] font-mono uppercase tracking-wider text-gray-400 border border-[rgba(255,255,255,0.1)] rounded bg-[#12121a]">
+                {skill}
+              </span>
+            ))}
+          </div>
+        </div>
+      </motion.div>
+    </motion.div>
+  );
+};
 
 const AboutUs = () => {
-  // Team members data with extended bios
   const team = [
     {
       name: "Nikhil Raikwar",
       role: "Tech Lead",
-      bio: "Nikhil is the technical visionary behind CritiqueConnect. With over 8 years of experience in full-stack development, he architected our platform from the ground up with a focus on scalability and user experience. His passion for creating tools that empower creators drives our product innovation.",
-      expertise: ["System Architecture", "Backend Development", "Database Design", "API Integration"]
+      bio: "Nikhil is the technical visionary behind CritiqueConnect. With over 8 years of experience in full-stack development, he architected our platform from the ground up with a focus on scalability and user experience.",
+      expertise: ["Architecture", "Backend", "Database", "API"]
     },
     {
       name: "Gaurav Verma",
       role: "Product Strategist",
-      bio: "As our product strategist, Gaurav bridges the gap between user needs and technical possibilities. His background in UX research and project management ensures that every feature we build serves a genuine user need. He's constantly speaking with users and refining our product roadmap.",
-      expertise: ["Product Management", "UX Research", "Strategic Planning", "Growth Metrics"]
+      bio: "As our product strategist, Gaurav bridges the gap between user needs and technical possibilities. His background in UX research ensures every feature we build serves a genuine purpose.",
+      expertise: ["Product", "UX Research", "Strategy", "Growth"]
     },
     {
       name: "Mohd Anas",
       role: "UX Designer",
-      bio: "Anas brings creativity and user empathy to every screen of CritiqueConnect. His work goes beyond aesthetics to create intuitive workflows that make complex feedback processes feel simple and natural. He's dedicated to ensuring that every user journey feels thoughtful and cohesive.",
-      expertise: ["UI/UX Design", "User Testing", "Wireframing", "Design Systems"]
+      bio: "Anas brings creativity and empathy to every screen. His work goes beyond aesthetics to create intuitive workflows that make complex feedback processes feel simple and natural.",
+      expertise: ["UI/UX", "User Testing", "Wireframing", "Systems"]
     },
     {
       name: "Hritik Roshan",
-      role: "Marketing & Growth",
-      bio: "Hritik Roshan leads our outreach and community building efforts. With experience in both traditional marketing and community management, he's focused on growing our user base while preserving the supportive culture that makes CritiqueConnect special. He's passionate about creator empowerment.",
-      expertise: ["Community Building", "Content Strategy", "Partnership Development", "User Acquisition"]
+      role: "Growth Ops",
+      bio: "Hritik leads our outreach and community efforts. With experience in traditional marketing and community management, he's focused on growing our user base while preserving culture.",
+      expertise: ["Community", "Strategy", "Partnerships", "Acquisition"]
     }
   ];
+
+  const mouseX = useMotionValue(0);
+  const mouseY = useMotionValue(0);
+  const springX = useSpring(mouseX, { stiffness: 60, damping: 20 });
+  const springY = useSpring(mouseY, { stiffness: 60, damping: 20 });
 
   return (
     <>
       <Navbar />
-      <div className="min-h-screen bg-gradient-to-br from-gray-900 to-gray-800 pt-32 pb-16 px-4 sm:px-6 lg:px-8">
-        {/* Header Section */}
-        <div className="max-w-6xl mx-auto mb-16">
-          <div className="text-center mb-12">
-            <h1 className="text-4xl md:text-5xl font-extrabold mb-4">
-              <span className="bg-clip-text text-transparent bg-gradient-to-r from-indigo-400 to-purple-500">
-                About CritiqueConnect
-              </span>
-            </h1>
-            <p className="text-gray-300 max-w-3xl mx-auto text-lg">
-              We're building a platform where creators of all types can receive honest, 
-              constructive feedback to refine their ideas and grow their skills.
-            </p>
+      <div className="min-h-screen bg-[#050505] pt-32 pb-16 px-4 font-ui overflow-hidden relative" onMouseMove={e => { mouseX.set(e.clientX); mouseY.set(e.clientY); }}>
+        <motion.div className="absolute inset-0 z-0 pointer-events-none" style={{ background: useMotionTemplate`radial-gradient(800px circle at ${springX}px ${springY}px, rgba(34, 211, 238, 0.05), transparent 80%)` }}/>
+        <div className="absolute inset-0 opacity-[0.02] bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0IiBoZWlnaHQ9IjQiPjxyZWN0IHdpZHRoPSI0IiBoZWlnaHQ9IjQiIGZpbGw9IiNmZmYiIGZpbGwtb3BhY2l0eT0iMC4wNSIvPjwvc3ZnPg==')] z-0 pointer-events-none" />
+
+        <div className="max-w-6xl mx-auto relative z-10">
+          <div className="text-center mb-20">
+            <motion.h1 initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} className="text-4xl md:text-5xl font-bold text-white mb-6">
+              System <span className="text-[#22d3ee]">Architects</span>
+            </motion.h1>
+            <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.1 }} className="text-gray-400 max-w-2xl mx-auto text-lg leading-relaxed">
+              We're building a deterministic space where professionals and creators algorithmically refine their concepts through honest, constructive data parameters.
+            </motion.p>
           </div>
 
-          {/* Our Story Section */}
-          <div className="bg-gray-800/70 backdrop-blur-sm rounded-2xl shadow-xl border border-purple-900/20 overflow-hidden transition-all duration-500 hover:shadow-purple-900/30 mb-16 p-8">
-            <h2 className="text-3xl font-bold text-gray-100 mb-6">Our Story</h2>
-            <div className="text-gray-300 space-y-4">
-              <p>
-                CritiqueConnect began in 2022 when our founding team members noticed a common problem across creative and technical fields: 
-                getting useful, constructive feedback on works-in-progress was difficult and often discouraging.
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-20">
+            <motion.div initial={{ opacity: 0, x: -30 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }} className="bg-[#0a0a0f] border border-[rgba(255,255,255,0.06)] rounded-2xl p-8">
+              <h2 className="text-xl font-mono uppercase tracking-widest text-white mb-4 flex items-center"><span className="w-2 h-2 bg-[#22d3ee] mr-3 rounded-full"></span> Origin Protocol</h2>
+              <p className="text-gray-400 text-sm leading-relaxed mb-4">
+                CritiqueConnect initialized in 2022 when our founding node noticed a common systemic flaw: obtaining high-fidelity, constructive feedback on works-in-progress had high latency and noise.
               </p>
-              <p>
-                As creators ourselves, we wanted a dedicated space where people could share their work and receive thoughtful critiques 
-                from peers and professionals who understand the creative process - without the noise and negativity often found on general social platforms.
+              <p className="text-gray-400 text-sm leading-relaxed">
+                As creators, we authored a dedicated space to compile critiques from peers and professionals, applying strict filters to omit the static often found on general social networks.
               </p>
-              <p>
-                What started as a simple tool for our own projects has evolved into a comprehensive platform serving creators across multiple disciplines, 
-                from software development and writing to design and art. Today, we're proud to support a growing community that values honesty, constructive dialogue, and mutual growth.
-              </p>
-            </div>
-          </div>
+            </motion.div>
 
-          {/* Our Mission Section */}
-          <div className="bg-gray-800/70 backdrop-blur-sm rounded-2xl shadow-xl border border-purple-900/20 overflow-hidden transition-all duration-500 hover:shadow-purple-900/30 mb-16 p-8">
-            <h2 className="text-3xl font-bold text-gray-100 mb-6">Our Mission</h2>
-            <div className="text-gray-300 space-y-4">
-              <p>
-                At CritiqueConnect, we believe that quality feedback is the catalyst for growth and innovation. Our mission is to create a supportive 
-                environment where creators can:
+            <motion.div initial={{ opacity: 0, x: 30 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }} className="bg-[#0a0a0f] border border-[rgba(255,255,255,0.06)] rounded-2xl p-8">
+              <h2 className="text-xl font-mono uppercase tracking-widest text-[#22d3ee] mb-4 flex items-center"><span className="w-2 h-2 bg-white mr-3 rounded-full"></span> Core Directive</h2>
+              <p className="text-gray-400 text-sm leading-relaxed mb-4">
+                Quality data input is the primary catalyst for growth algorithms. Our directive is to instantiate an environment where modules can:
               </p>
-              <ul className="list-disc pl-5 space-y-2">
-                <li>Share their work without fear of judgement</li>
-                <li>Receive specific, actionable feedback from relevant perspectives</li>
-                <li>Build meaningful connections with peers and mentors</li>
-                <li>Continuously improve their craft through constructive dialogue</li>
+              <ul className="space-y-2 text-sm text-gray-400 font-mono">
+                <li className="flex items-center"><span className="text-[#22d3ee] mr-2">›</span> Deploy schemas without judgment thresholds</li>
+                <li className="flex items-center"><span className="text-[#22d3ee] mr-2">›</span> Receive structured, actionable parameters</li>
+                <li className="flex items-center"><span className="text-[#22d3ee] mr-2">›</span> Establish encrypted mentor connections</li>
               </ul>
-              <p>
-                We're dedicated to fostering a community that values respect, honesty, and growth - one critique at a time.
-              </p>
-            </div>
+            </motion.div>
           </div>
-        </div>
 
-        {/* Team Section */}
-        <div className="max-w-6xl mx-auto">
-          <h2 className="text-3xl font-bold text-center text-gray-100 mb-12">
-            Meet Our Team
-          </h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            {team.map((member, index) => (
-              <div 
-                key={index} 
-                className="bg-gray-800/70 backdrop-blur-sm rounded-xl shadow-xl border border-purple-900/20 overflow-hidden transition-all duration-300 hover:shadow-purple-900/30 hover:-translate-y-1"
-              >
-                <div className="p-8">
-                  <div className="flex items-center mb-6">
-                    <img 
-                      src={avatar} 
-                      alt={member.name} 
-                      className="w-20 h-20 rounded-full object-cover border-2 border-purple-500 shadow-md mr-5" 
-                    />
-                    <div>
-                      <h3 className="text-xl font-bold text-gray-100">{member.name}</h3>
-                      <p className="text-purple-400 font-medium">{member.role}</p>
-                    </div>
-                  </div>
-                  <p className="text-gray-300 mb-6">{member.bio}</p>
-                  <div>
-                    <h4 className="text-sm uppercase tracking-wider text-gray-400 mb-3">Expertise</h4>
-                    <div className="flex flex-wrap gap-2">
-                      {member.expertise.map((skill, skillIndex) => (
-                        <span 
-                          key={skillIndex} 
-                          className="px-3 py-1 text-xs font-medium text-purple-300 bg-purple-900/30 rounded-full"
-                        >
-                          {skill}
-                        </span>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-              </div>
+          <motion.div initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="text-center mb-12">
+            <h2 className="text-3xl font-bold text-white mb-2">The Node Cluster</h2>
+            <p className="text-[#22d3ee] font-mono text-sm uppercase tracking-widest">Active Maintainers</p>
+          </motion.div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {team.map((member, i) => (
+              <TiltCard key={member.name} member={member} index={i} />
             ))}
-          </div>
-        </div>
-
-        {/* Values Section */}
-        <div className="max-w-6xl mx-auto mt-20">
-          <h2 className="text-3xl font-bold text-center text-gray-100 mb-12">
-            Our Values
-          </h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {/* Value 1 */}
-            <div className="bg-gray-800/70 backdrop-blur-sm rounded-xl shadow-xl border border-purple-900/20 p-6 relative">
-              <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-blue-500 to-indigo-500"></div>
-              <h3 className="text-xl font-bold text-gray-100 mb-3">Honesty & Respect</h3>
-              <p className="text-gray-300">
-                We believe in feedback that's both truthful and respectful. The best critiques come from a place of genuine desire to help others improve.
-              </p>
-            </div>
-            
-            {/* Value 2 */}
-            <div className="bg-gray-800/70 backdrop-blur-sm rounded-xl shadow-xl border border-purple-900/20 p-6 relative">
-              <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-indigo-500 to-purple-600"></div>
-              <h3 className="text-xl font-bold text-gray-100 mb-3">Continuous Growth</h3>
-              <p className="text-gray-300">
-                We're committed to the belief that everyone - regardless of skill level - has room to grow and improve through thoughtful feedback.
-              </p>
-            </div>
-            
-            {/* Value 3 */}
-            <div className="bg-gray-800/70 backdrop-blur-sm rounded-xl shadow-xl border border-purple-900/20 p-6 relative">
-              <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-purple-600 to-pink-500"></div>
-              <h3 className="text-xl font-bold text-gray-100 mb-3">Community</h3>
-              <p className="text-gray-300">
-                We're building more than a platform - we're cultivating a community of creators who support each other's journey of improvement.
-              </p>
-            </div>
           </div>
         </div>
       </div>
@@ -173,4 +150,4 @@ const AboutUs = () => {
   );
 };
 
-export default AboutUs; 
+export default AboutUs;
