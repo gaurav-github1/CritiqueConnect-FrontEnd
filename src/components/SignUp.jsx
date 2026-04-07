@@ -382,33 +382,7 @@ const SignUp = ({ isLogin: initialIsLogin = false }) => {
             )}
               </AnimatePresence>
 
-            {/* New Form Fields for User Type */}
-              <AnimatePresence>
-            {!isLogin && (
-                  <motion.div 
-                    key="user-type"
-                    variants={itemVariants}
-                    initial={{ opacity: 0, height: 0 }}
-                    animate={{ opacity: 1, height: 'auto' }}
-                    exit={{ opacity: 0, height: 0 }}
-                    className="space-y-2 overflow-hidden"
-                  >
-                    <label className="block text-gray-300 font-medium" htmlFor="user-type">
-                  Are you a student or a professional?
-                </label>
-                <select
-                  id="user-type"
-                  value={userType}
-                  onChange={(e) => setUserType(e.target.value)}
-                  required
-                      className="w-full px-4 py-3 border border-[#9c4dff]/30 rounded-lg bg-[#120822]/70 text-gray-200 shadow-inner focus:outline-none focus:ring-2 focus:ring-[#c840eb] focus:border-transparent transition-all duration-300"
-                >
-                  <option value="student">Student</option>
-                  <option value="professional">Professional</option>
-                </select>
-                  </motion.div>
-            )}
-              </AnimatePresence>
+
 
             {/* Show Additional Fields for Professionals */}
               <AnimatePresence>
