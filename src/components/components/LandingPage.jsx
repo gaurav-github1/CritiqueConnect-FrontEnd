@@ -10,7 +10,7 @@ import SignUp from '../SignUp.jsx'; // Import SignUp component
 
 function LandingPage() {
   return (
-    <div className="min-h-screen bg-gray-900">
+    <div className="min-h-screen">
       <Navbar />
       <Routes>
         {/* Define routes for each section */}

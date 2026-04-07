@@ -14,6 +14,20 @@ import AboutUs from './components/components/AboutUs';
 import ProtectedRoute from './components/ProtectedRoute';
 import { AuthProvider } from './contexts/AuthContext';
 import Lenis from '@studio-freight/lenis';
+import { useLocation } from 'react-router-dom';
+
+// Theme Wrapper handles page-by-page Apple light vs dark mode
+const ThemeWrapper = ({ children }) => {
+  const location = useLocation();
+  const lightPaths = ['/', '/login', '/signup', '/reviews', '/about-us'];
+  const isLight = lightPaths.includes(location.pathname);
+
+  React.useEffect(() => {
+    document.body.setAttribute('data-theme', isLight ? 'light' : 'dark');
+  }, [isLight]);
+
+  return <>{children}</>;
+};
 
 function App() {
   React.useEffect(() => {
@@ -41,8 +55,9 @@ function App() {
 
   return (
     <Router>
-      <AuthProvider>
-        <Routes>
+      <ThemeWrapper>
+        <AuthProvider>
+          <Routes>
           <Route path="/" element={<LandingPage />} />
           <Route path="/signup" element={<SignUp/>} />
           <Route path="/login" element={<SignUp isLogin={true}/>} />
@@ -87,6 +102,7 @@ function App() {
           <Route path="*" element={<Navigate to="/" />} />
         </Routes>
       </AuthProvider>
+      </ThemeWrapper>
     </Router>
   );
 }

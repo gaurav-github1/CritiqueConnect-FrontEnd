@@ -5,138 +5,226 @@
 @tailwind utilities;
 
 :root {
-  --bg-base: #050505;        /* True near-black */
-  --bg-card: #0a0a0f;        /* Card surface */
-  --bg-surface: #0f0f1a;     /* Elevated surface */
-  --accent-primary: #22d3ee; /* Cyan-400 action color */
-  --accent-glow: rgba(34, 211, 238, 0.15);
-  --text-primary: #f0f0f0;
-  --text-secondary: #94a3b8;
-  --border-subtle: rgba(255,255,255,0.06);
+  /* Dynamic Background Surfaces */
+  --surface-light: #F5F5F7;   /* Apple soft white */
+  --surface-dark: #050505;    /* True black */
+  --surface-panel: #0A0A0F;   /* Deep space — for dark sections on light pages */
+  
+  /* Text Accents */
+  --text-on-light: #1D1D1F;   /* Apple near black */
+  --text-on-dark: #F5F5F7;    /* Apple off-white */
+  
+  /* Brand Accents */
+  --accent: #0A84FF;           /* Apple System Blue */
+  --accent-secondary: #30D158; /* Apple Green for Success */
+  --accent-glow: rgba(10, 132, 255, 0.2);
+  --accent-glow-strong: rgba(10, 132, 255, 0.35);
+  
+  /* Glass Tokens */
+  --glass-light: rgba(255, 255, 255, 0.72);
+  --glass-dark: rgba(20, 20, 28, 0.6);
+  --blur: 24px;
+  --blur-heavy: 40px;
+  --specular: rgba(255, 255, 255, 0.3);
+  --specular-dark: rgba(255, 255, 255, 0.12);
+  --border-subtle: rgba(255, 255, 255, 0.07);
+  --border-subtle-dark: rgba(0, 0, 0, 0.08);
+  
+  /* Fonts */
   --font-ui: 'Inter', sans-serif;
   --font-mono: 'JetBrains Mono', monospace;
 }
 
+/* =========================================
+   Base Reset
+   ========================================= */
 body {
   font-family: var(--font-ui);
-  background-color: var(--bg-base);
-  color: var(--text-primary);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body[data-theme="light"] {
+  background-color: var(--surface-light);
+  color: var(--text-on-light);
+}
+
+body[data-theme="dark"] {
+  background-color: var(--surface-dark);
+  color: var(--text-on-dark);
 }
 
 .font-mono {
   font-family: var(--font-mono);
 }
 
-/* Global Shared Animations */
-@keyframes pulse-slow {
-  0% { opacity: 0.4; transform: scale(1); }
-  50% { opacity: 0.6; transform: scale(1.1); }
-  100% { opacity: 0.4; transform: scale(1); }
+/* =========================================
+   Utility Classes (Apple Liquid Glass)
+   ========================================= */
+
+/* Frosted glass for light mode components */
+.glass-light {
+  background: var(--glass-light);
+  backdrop-filter: blur(var(--blur)) saturate(180%);
+  -webkit-backdrop-filter: blur(var(--blur)) saturate(180%);
+  border: 1px solid var(--border-subtle-dark);
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.06);
 }
 
-.animate-pulse-slow {
-  animation: pulse-slow 4s ease-in-out infinite;
+/* Frosted glass for dark mode components */
+.glass-dark {
+  background: var(--glass-dark);
+  backdrop-filter: blur(var(--blur)) saturate(180%);
+  -webkit-backdrop-filter: blur(var(--blur)) saturate(180%);
+  border: 1px solid var(--border-subtle);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
 }
 
-@keyframes float-bob {
+/* Navbar specific blurring */
+.glass-nav {
+  background: rgba(255, 255, 255, 0.18);
+  backdrop-filter: blur(var(--blur-heavy)) saturate(200%);
+  -webkit-backdrop-filter: blur(var(--blur-heavy)) saturate(200%);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.25), 0 8px 32px rgba(0, 0, 0, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+body[data-theme="dark"] .glass-nav {
+  background: rgba(10, 10, 15, 0.5);
+  border-color: rgba(255, 255, 255, 0.06);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05), 0 8px 32px rgba(0, 0, 0, 0.5);
+}
+
+/* Solid premium card for light panels (no transparency issue) */
+.card-solid-light {
+  background: #FFFFFF;
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.06), 0 1px 4px rgba(0, 0, 0, 0.04);
+}
+
+/* Top-edge specular light reflection */
+.specular-highlight {
+  position: relative;
+}
+.specular-highlight::before {
+  content: "";
+  position: absolute;
+  top: 0; left: 0; right: 0; height: 1px;
+  background: linear-gradient(90deg, transparent, var(--specular-dark), transparent);
+  z-index: 10;
+  border-radius: inherit;
+  pointer-events: none;
+}
+
+/* Apple-style CTA button */
+.btn-apple {
+  background: var(--accent);
+  color: white;
+  padding: 0.75rem 1.5rem;
+  border-radius: 9999px;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.25s cubic-bezier(0.25, 1, 0.5, 1);
+  border: none;
+  cursor: pointer;
+}
+.btn-apple:hover {
+  transform: scale(1.03);
+  box-shadow: 0 6px 24px var(--accent-glow-strong);
+  filter: brightness(1.08);
+}
+.btn-apple:active {
+  transform: scale(0.97);
+}
+
+/* =========================================
+   Animations
+   ========================================= */
+
+/* Slow float bob */
+@keyframes float {
   0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-8px); }
+  50% { transform: translateY(-6px); }
+}
+.animate-float {
+  animation: float 5s cubic-bezier(0.4, 0, 0.2, 1) infinite;
 }
 
-.animate-float-bob {
-  animation: float-bob 3s ease-in-out infinite;
+/* Pulse slow — used for orb blobs */
+@keyframes pulse-slow {
+  0%, 100% { opacity: 0.4; transform: scale(1); }
+  50% { opacity: 0.7; transform: scale(1.05); }
+}
+.animate-pulse-slow {
+  animation: pulse-slow 6s ease-in-out infinite;
 }
 
+/* Glow pulse for borders/rings */
 @keyframes glow-pulse {
   0%, 100% { opacity: 0.4; filter: blur(20px); }
   50% { opacity: 0.8; filter: blur(30px); }
 }
-
 .animate-glow-pulse {
   animation: glow-pulse 3s ease-in-out infinite;
 }
 
-@keyframes spotlight-move {
-  0%, 100% { transform: translate(-50%, -50%) scale(1); }
-  50% { transform: translate(-50%, -50%) scale(1.1); }
+/* Marquee scroll for reviews */
+@keyframes marquee {
+  0% { transform: translateX(0%); }
+  100% { transform: translateX(-33.333%); }
+}
+.animate-marquee {
+  animation: marquee 30s linear infinite;
+  display: flex;
+}
+.animate-marquee:hover {
+  animation-play-state: paused;
 }
 
-.animate-spotlight-move {
-  animation: spotlight-move 4s ease-in-out infinite;
-}
-
+/* Shimmer loading effect */
 @keyframes shimmer {
-  0% { background-position: -200% center; }
-  100% { background-position: 200% center; }
+  0% { transform: translateX(-150%); }
+  100% { transform: translateX(150%); }
 }
-
 .bg-shimmer {
+  position: relative;
+  overflow: hidden;
+}
+.bg-shimmer::after {
+  content: "";
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
   background: linear-gradient(90deg, 
     rgba(255,255,255,0) 0%, 
     rgba(255,255,255,0.05) 50%, 
     rgba(255,255,255,0) 100%);
-  background-size: 200% auto;
-  animation: shimmer 3s infinite linear;
+  animation: shimmer 2s infinite ease-in-out;
 }
 
+/* =========================================
+   Color Utility Overrides
+   ========================================= */
+.bg-accent { background-color: var(--accent); }
+.text-accent { color: var(--accent); }
+.border-accent { border-color: var(--accent); }
 
-
-#cta {
-  background-image: url('./assets/images/bg-simplify-section-desktop.svg');
-  background-repeat: no-repeat;
-}
-
-@media (max-width: 576px) {
-
-
-  #cta {
-    background-image: url('./assets/images/bg-simplify-section-mobile.svg');
-  }
-}
-
-/* Hamburger Menu */
-.hamburger {
-  cursor: pointer;
-  width: 24px;
-  height: 24px;
-  transition: all 0.25s;
+/* =========================================
+   Section Dividers
+   ========================================= */
+.divider-light-to-dark {
+  background: linear-gradient(to bottom, var(--surface-light), var(--surface-panel));
+  height: 80px;
+  margin-top: -80px;
   position: relative;
+  z-index: 5;
+  pointer-events: none;
 }
-
-.hamburger-top,
-.hamburger-middle,
-.hamburger-bottom {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 24px;
-  height: 2px;
-  background: #000;
-  transform: rotate(0);
-  transition: all 0.5s;
-}
-
-.hamburger-middle {
-  transform: translateY(7px);
-}
-
-.hamburger-bottom {
-  transform: translateY(14px);
-}
-
-.open {
-  transform: rotate(90deg);
-  transform: translateY(0px);
-}
-
-.open .hamburger-top {
-  transform: rotate(45deg) translateY(6px) translate(6px);
-}
-
-.open .hamburger-middle {
-  display: none;
-}
-
-.open .hamburger-bottom {
-  transform: rotate(-45deg) translateY(6px) translate(-6px);
+.divider-dark-to-light {
+  background: linear-gradient(to bottom, var(--surface-panel), var(--surface-light));
+  height: 80px;
+  margin-top: -80px;
+  position: relative;
+  z-index: 5;
+  pointer-events: none;
 }

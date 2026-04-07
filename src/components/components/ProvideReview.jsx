@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import Navbar from './Navbar';
-import Footer from './Footer';
 import axios from 'axios';
 import { useAuth } from '../../contexts/AuthContext';
 import { motion, AnimatePresence, useMotionValue, useSpring, useMotionTemplate } from 'framer-motion';
@@ -265,7 +264,6 @@ function ProvideReview() {
           </AnimatePresence>
         </div>
       </div>
-      <Footer />
     </>
   );
 }

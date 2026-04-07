@@ -2,219 +2,132 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 
-import companyLogoWhite from '../assets/images/Screenshot (279)_enhanced.png';
+import companyLogo from '../assets/images/Screenshot (279)_enhanced.png';
 import facebookLogo from '../assets/images/icon-facebook.svg';
 import youtubeLogo from '../assets/images/icon-youtube.svg';
 import twitterLogo from '../assets/images/icon-twitter.svg';
 import pinterestLogo from '../assets/images/icon-pinterest.svg';
 import instagramLogo from '../assets/images/icon-instagram.svg';
 
+const containerVariant = {
+  hidden: { opacity: 0 },
+  visible: { opacity: 1, transition: { staggerChildren: 0.08, delayChildren: 0.05 } }
+};
+const itemVariant = {
+  hidden: { y: 16, opacity: 0 },
+  visible: { y: 0, opacity: 1, transition: { type: 'spring', stiffness: 100, damping: 15 } }
+};
+
+const FooterLink = ({ to, children }) => (
+  <Link
+    to={to}
+    className="block text-gray-500 text-sm hover:text-[var(--accent)] transition-colors duration-200 py-0.5"
+  >
+    {children}
+  </Link>
+);
+
 const Footer = () => {
-  // Animation variants
-  const containerVariant = {
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: {
-        staggerChildren: 0.1,
-        delayChildren: 0.1
-      }
-    }
-  };
-
-  const itemVariant = {
-    hidden: { y: 20, opacity: 0 },
-    visible: {
-      y: 0,
-      opacity: 1,
-      transition: {
-        type: "spring",
-        stiffness: 100,
-        damping: 15
-      }
-    }
-  };
-
   return (
-    <div className="relative bg-[#050505] overflow-hidden">
-      <div className="absolute inset-0 bg-gradient-to-b from-transparent to-[#050505] pointer-events-none z-0" />
-      {/* Background grid lines */}
-      <div 
-        className="absolute inset-0 opacity-10 z-0"
-        style={{
-          backgroundImage: `
-            linear-gradient(to right, rgba(255, 255, 255, 0.06) 1px, transparent 1px),
-            linear-gradient(to bottom, rgba(255, 255, 255, 0.06) 1px, transparent 1px)
-          `,
-          backgroundSize: '80px 80px'
-        }}
-      />
-      
-      {/* Glow orbs */}
-      <div className="absolute bottom-1/4 left-1/3 w-[400px] h-[400px] rounded-full bg-[#22d3ee]/5 blur-[120px] opacity-40 z-0"></div>
-      <div className="absolute top-1/3 right-1/4 w-[300px] h-[300px] rounded-full bg-[#22d3ee]/5 blur-[100px] opacity-40 z-0"></div>
-      
-      <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-[rgba(34,211,238,0.3)] to-transparent z-10"></div>
-      
-      {/* Flex Container */}
-      <motion.div 
+    <div className="relative bg-[#0A0A0F] overflow-hidden border-t border-white/5">
+      {/* Subtle accent line at very top */}
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-48 h-px bg-gradient-to-r from-transparent via-[var(--accent)]/60 to-transparent" />
+
+      <motion.div
         variants={containerVariant}
         initial="hidden"
         whileInView="visible"
         viewport={{ once: true, amount: 0.2 }}
-        className="container relative mx-auto flex flex-col-reverse justify-between px-6 py-16 space-y-12 md:flex-row md:space-y-0 z-10"
+        className="container mx-auto px-6 pt-16 pb-10 z-10 relative"
       >
-        {/* Logo and social links container */}
-        <motion.div 
-          variants={itemVariant}
-          className="flex flex-col-reverse items-center justify-between md:flex-col md:items-start"
-        >
-          <motion.div 
-            variants={itemVariant}
-            className="my-6 text-center text-gray-300 md:hidden"
-          >
-            Copyright © {new Date().getFullYear()}, All Rights Reserved
-          </motion.div>
-          
-          {/* Logo */}
-          <motion.div 
-            variants={itemVariant}
-            whileHover={{ scale: 1.05 }}
-            className="relative"
-          >
-            <img 
-              src={companyLogoWhite} 
-              className="w-48 rounded-lg mb-10 z-10 relative" 
-              alt="Company Logo" 
-            />
-            <div className="absolute -inset-1 bg-[#22d3ee]/10 rounded-lg blur-sm opacity-0 group-hover:opacity-100 transition-opacity -z-10"></div>
-          </motion.div>
-          
-          {/* Social Links Container */}
-          <motion.div 
-            variants={itemVariant}
-            className="flex justify-center space-x-4 mt-4 md:mt-0"
-          >
-            {[
-              { icon: facebookLogo, alt: 'Facebook' },
-              { icon: youtubeLogo, alt: 'YouTube' },
-              { icon: twitterLogo, alt: 'Twitter' },
-              { icon: pinterestLogo, alt: 'Pinterest' },
-              { icon: instagramLogo, alt: 'Instagram' },
-            ].map((social, index) => (
-              <motion.div 
-                key={social.alt}
-                whileHover={{ 
-                  scale: 1.2, 
-                  y: -5,
-                  rotate: 5,
-                  transition: { type: "spring", stiffness: 300 }
-                }}
-                className="relative group"
-              >
-                <Link to="/">
-                  <img 
-                    src={social.icon} 
-                    className="h-8 transition-all duration-300 relative z-10" 
-                    alt={social.alt} 
-                  />
-                  <div className="absolute -inset-2 rounded-full bg-[#22d3ee]/20 blur-sm opacity-0 group-hover:opacity-100 transition-opacity -z-10"></div>
-                </Link>
-              </motion.div>
-            ))}
-          </motion.div>
-        </motion.div>
-        
-        {/* List Container */}
-        <motion.div 
-          variants={itemVariant}
-          className="flex justify-around space-x-12"
-        >
-          <div className="flex flex-col space-y-4">
-            {[
-              { to: '/', label: 'Home' },
-              { to: '/dashboard', label: 'Dashboard' },
-              { to: '/categories', label: 'Categories' },
-              { to: '/about-us', label: 'About Us' },
-            ].map((link) => (
-              <motion.div 
-                key={link.label}
-                whileHover={{ x: 5 }}
-                className="relative group"
-              >
-                <Link 
-                  to={link.to} 
-                  className="text-gray-300 hover:text-[#22d3ee] transition duration-300 group-hover:pl-1"
+        {/* Top Row */}
+        <div className="flex flex-col lg:flex-row gap-12 lg:gap-20 mb-14">
+
+          {/* Brand Column */}
+          <motion.div variants={itemVariant} className="lg:w-64 flex-shrink-0">
+            <motion.div whileHover={{ scale: 1.04 }} className="mb-6 inline-block">
+              <img src={companyLogo} className="h-9 w-auto object-contain" alt="CritiqueConnect Logo" />
+            </motion.div>
+            <p className="text-gray-500 text-sm leading-relaxed mb-6">
+              Expert feedback infrastructure for builders who care about quality.
+            </p>
+            {/* Social Icons */}
+            <div className="flex items-center space-x-3">
+              {[
+                { icon: facebookLogo, alt: 'Facebook' },
+                { icon: twitterLogo, alt: 'Twitter' },
+                { icon: instagramLogo, alt: 'Instagram' },
+                { icon: youtubeLogo, alt: 'YouTube' },
+                { icon: pinterestLogo, alt: 'Pinterest' },
+              ].map((social) => (
+                <motion.button
+                  key={social.alt}
+                  whileHover={{ scale: 1.2, y: -2, transition: { type: 'spring', stiffness: 400 } }}
+                  className="w-8 h-8 rounded-full bg-white/5 border border-white/8 flex items-center justify-center hover:bg-[var(--accent)] hover:border-[var(--accent)] transition-colors duration-300 group"
                 >
-                  {link.label}
-                  <span className="absolute -bottom-1 left-0 w-full h-[1px] bg-[#22d3ee] origin-left scale-x-0 group-hover:scale-x-100 transition-transform duration-300"></span>
-                </Link>
-              </motion.div>
-            ))}
-          </div>
-          <div className="flex flex-col space-y-4">
-            {[
-              { to: '/reviews', label: 'Reviews' },
-              { to: '/seek-review', label: 'Seek Review' },
-              { to: '/provide-review', label: 'Provide Review' },
-              { to: '/privacy-policy', label: 'Privacy Policy' },
-            ].map((link) => (
-              <motion.div 
-                key={link.label}
-                whileHover={{ x: 5 }}
-                className="relative group"
-              >
-                <Link 
-                  to={link.to} 
-                  className="text-gray-300 hover:text-[#22d3ee] transition duration-300 group-hover:pl-1"
-                >
-                  {link.label}
-                  <span className="absolute -bottom-1 left-0 w-0 h-[1px] bg-[#22d3ee] group-hover:w-full transition-all duration-300"></span>
-                </Link>
-              </motion.div>
-            ))}
-          </div>
-        </motion.div>
-        
-        {/* Newsletter Container */}
-        <motion.div 
-          variants={itemVariant}
-          className="flex flex-col justify-between"
-        >
-          <motion.form
-            variants={itemVariant}
-            className="relative"
-          >
-            <h3 className="text-gray-200 font-medium mb-4 text-lg">Stay Connected</h3>
-            <div className="flex space-x-3">
-              <input
-                type="text"
-                className="flex-1 px-4 py-2 rounded-full bg-[#12121a] backdrop-blur-sm border border-[rgba(255,255,255,0.1)] text-gray-200 shadow-inner focus:outline-none focus:ring-2 focus:ring-[#22d3ee] focus:border-transparent transition-all duration-300"
-                placeholder="Updates in your inbox"
-              />
-              <motion.button 
-                className="relative px-6 py-2 text-white font-medium rounded-full overflow-hidden group"
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-              >
-                <div className="absolute inset-0 bg-[#22d3ee] rounded-full"></div>
-                
-                {/* Button hover effect */}
-                <div className="absolute inset-0 w-full h-full bg-[#67e8f9] opacity-0 group-hover:opacity-100 transition-all duration-500"></div>
-                
-                {/* Animated ripple effect on hover */}
-                <span className="absolute inset-0 w-0 h-0 rounded-full bg-white opacity-10 group-hover:w-full group-hover:h-full transition-all duration-500 ease-out"></span>
-                
-                <span className="relative z-10 text-[#050505]">Go</span>
-              </motion.button>
+                  <img src={social.icon} className="h-3.5 opacity-50 group-hover:opacity-100 transition-opacity" alt={social.alt} />
+                </motion.button>
+              ))}
             </div>
-          </motion.form>
-          <motion.div 
-            variants={itemVariant}
-            className="hidden text-gray-400 md:block mt-8"
-          >
-            Copyright © {new Date().getFullYear()}, All Rights Reserved
           </motion.div>
+
+          {/* Links Columns */}
+          <div className="flex-1 grid grid-cols-2 md:grid-cols-3 gap-8">
+            <motion.div variants={itemVariant}>
+              <h4 className="text-white text-xs font-semibold uppercase tracking-widest mb-4">Platform</h4>
+              <div className="space-y-2">
+                <FooterLink to="/">Home</FooterLink>
+                <FooterLink to="/dashboard">Dashboard</FooterLink>
+                <FooterLink to="/categories">Categories</FooterLink>
+                <FooterLink to="/reviews">Reviews</FooterLink>
+              </div>
+            </motion.div>
+
+            <motion.div variants={itemVariant}>
+              <h4 className="text-white text-xs font-semibold uppercase tracking-widest mb-4">Actions</h4>
+              <div className="space-y-2">
+                <FooterLink to="/seek-review">Seek a Review</FooterLink>
+                <FooterLink to="/provide-review">Provide a Review</FooterLink>
+                <FooterLink to="/about-us">About Us</FooterLink>
+                <FooterLink to="/privacy-policy">Privacy Policy</FooterLink>
+              </div>
+            </motion.div>
+
+            {/* Newsletter */}
+            <motion.div variants={itemVariant} className="col-span-2 md:col-span-1">
+              <h4 className="text-white text-xs font-semibold uppercase tracking-widest mb-4">Stay in the loop</h4>
+              <p className="text-gray-500 text-sm mb-4 leading-relaxed">
+                Get platform updates and top feedback stories delivered to you.
+              </p>
+              <div className="flex bg-white/5 rounded-full p-1 border border-white/8 focus-within:border-[var(--accent)]/50 focus-within:ring-1 focus-within:ring-[var(--accent)]/20 transition-all">
+                <input
+                  type="email"
+                  className="flex-1 px-4 py-2 bg-transparent text-gray-300 focus:outline-none text-sm placeholder-gray-600"
+                  placeholder="you@email.com"
+                />
+                <button className="btn-apple !py-2 !px-4 text-xs !rounded-full" type="button">
+                  Subscribe
+                </button>
+              </div>
+            </motion.div>
+          </div>
+        </div>
+
+        {/* Bottom Bar */}
+        <motion.div
+          variants={itemVariant}
+          className="border-t border-white/5 pt-8 flex flex-col sm:flex-row items-center justify-between gap-4"
+        >
+          <p className="text-gray-600 text-xs">
+            © {new Date().getFullYear()} CritiqueConnect. All rights reserved.
+          </p>
+          <div className="flex items-center gap-1">
+            <span className="text-gray-600 text-xs">Built with</span>
+            <svg className="w-3.5 h-3.5 text-red-500 mx-1" fill="currentColor" viewBox="0 0 20 20">
+              <path fillRule="evenodd" d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z" clipRule="evenodd" />
+            </svg>
+            <span className="text-gray-600 text-xs">by the CritiqueConnect team</span>
+          </div>
         </motion.div>
       </motion.div>
     </div>

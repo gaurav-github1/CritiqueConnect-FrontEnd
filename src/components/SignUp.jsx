@@ -1,26 +1,25 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { signInWithEmailAndPassword, createUserWithEmailAndPassword } from "firebase/auth";
 import { auth } from "../Utils/firebase";
 import Navbar from './components/Navbar';
-import Footer from './components/Footer';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { motion, AnimatePresence, useMotionValue, useSpring, useMotionTemplate } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 
-// Floating Input Component to standardise the styling
-const FloatingInput = ({ id, label, type, value, onChange, required }) => (
-  <div className="relative group/input z-0 w-full mb-2">
+// Apple floating-label input — light theme
+const AppleInput = ({ id, label, type, value, onChange, required }) => (
+  <div className="relative z-0 w-full mb-6 group/input">
     <input
       id={id}
       type={type}
       value={value}
       onChange={onChange}
       required={required}
-      placeholder=" " /* Required for peer-placeholder-shown */
-      className="block w-full px-4 pt-6 pb-2 border border-[rgba(255,255,255,0.06)] rounded-lg bg-[#0a0a0f] text-gray-200 shadow-inner focus:outline-none focus:ring-1 focus:ring-[#22d3ee] focus:border-[#22d3ee] transition-all duration-300 peer"
+      placeholder=" "
+      className="block w-full px-0 pt-6 pb-2 bg-transparent border-0 border-b-2 border-gray-200 text-[var(--text-on-light)] appearance-none focus:outline-none focus:ring-0 focus:border-[var(--accent)] transition-colors peer"
     />
-    <label 
+    <label
       htmlFor={id}
-      className="absolute text-gray-400 font-medium duration-300 transform -translate-y-2 scale-[0.8] top-4 left-4 z-10 origin-[0] peer-focus:text-[#22d3ee] peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-1 peer-focus:scale-[0.8] peer-focus:-translate-y-2 pointer-events-none"
+      className="absolute text-gray-400 font-medium duration-300 transform -translate-y-4 scale-75 top-4 z-10 origin-[0] peer-focus:text-[var(--accent)] peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-4 pointer-events-none"
     >
       {label}
     </label>
@@ -38,41 +37,18 @@ const SignUp = ({ isLogin: initialIsLogin = false }) => {
   const [linkdedin, setLinkedin] = useState('');
   const [domains, setDomains] = useState([]);
   const [loading, setLoading] = useState(false);
-  
+
   const navigate = useNavigate();
   const location = useLocation();
   const from = location.state?.from || '/dashboard';
-  
-  // Spotlight effect
-  const mouseX = useMotionValue(0);
-  const mouseY = useMotionValue(0);
-  const springX = useSpring(mouseX, { stiffness: 60, damping: 20 });
-  const springY = useSpring(mouseY, { stiffness: 60, damping: 20 });
-  
-  useEffect(() => {
-    const handleMouseMove = (e) => {
-      mouseX.set(e.clientX);
-      mouseY.set(e.clientY);
-    };
-    window.addEventListener('mousemove', handleMouseMove);
-    return () => window.removeEventListener('mousemove', handleMouseMove);
-  }, []);
 
-  // Animation variants
   const containerVariants = {
     hidden: { opacity: 0 },
-    visible: { 
-      opacity: 1, 
-      transition: { staggerChildren: 0.06, delayChildren: 0.1 }
-    }
+    visible: { opacity: 1, transition: { staggerChildren: 0.05, delayChildren: 0.1 } }
   };
-  
   const itemVariants = {
     hidden: { y: 20, opacity: 0 },
-    visible: {
-      y: 0, opacity: 1,
-      transition: { type: "spring", stiffness: 120, damping: 14 }
-    }
+    visible: { y: 0, opacity: 1, transition: { type: "spring", stiffness: 120, damping: 14 } }
   };
 
   const handleDomainChange = (e) => {
@@ -82,37 +58,24 @@ const SignUp = ({ isLogin: initialIsLogin = false }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!/\S+@\S+\.\S+/.test(email)) {
-      setError('Please enter a valid email.');
-      return;
-    }
+    if (!/\S+@\S+\.\S+/.test(email)) { setError('Please enter a valid email.'); return; }
     setError('');
     setLoading(true);
-  
     try {
       if (isLogin) {
         await signInWithEmailAndPassword(auth, email, password);
         navigate(from);
       } else {
-        if (password !== confirmPassword) {
-          setError('Passwords do not match.'); setLoading(false); return;
-        }
-        const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-        
+        if (password !== confirmPassword) { setError('Passwords do not match.'); setLoading(false); return; }
+        await createUserWithEmailAndPassword(auth, email, password);
         if (userType === 'professional' && organization && domains.length > 0 && linkdedin) {
           const response = await fetch('https://critiquebackend.onrender.com/user/signup', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              email, OrganisationName: organization, domains, linkedin: linkdedin, role: 'professional',
-            }),
+            body: JSON.stringify({ email, OrganisationName: organization, domains, linkedin: linkdedin, role: 'professional' }),
           });
-  
-          if (response.ok) {
-            navigate('/dashboard', { state: { email } });
-          } else {
-            setError('Failed to save professional data. Please try again.');
-          }
+          if (response.ok) { navigate('/dashboard', { state: { email } }); }
+          else { setError('Failed to save professional data. Please try again.'); }
         } else {
           navigate('/dashboard', { state: { email } });
         }
@@ -126,45 +89,110 @@ const SignUp = ({ isLogin: initialIsLogin = false }) => {
     }
   };
 
+  const titleWords = ["Refine.", "Iterate.", "Perfect."];
+
   return (
-    <>
+    <div className="flex min-h-screen bg-[var(--surface-light)] font-ui overflow-hidden">
       <Navbar />
-      <div className="relative min-h-screen bg-[#050505] pt-32 pb-16 px-4 sm:px-6 lg:px-8 overflow-hidden font-ui">
-        
-        {/* Spotlight Grid Background */}
-        <motion.div 
-          className="absolute inset-0 z-0 pointer-events-none"
+
+      {/* ─── LEFT PANEL: Home page hero clone ─────────────────── */}
+      <div className="hidden lg:flex lg:w-[55%] relative items-center justify-center overflow-hidden bg-[var(--surface-light)]">
+
+        {/* Same blurred orb as the home hero */}
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-2xl h-full pointer-events-none z-0">
+          <div className="w-[520px] h-[520px] mx-auto mt-16 bg-gradient-to-tr from-[var(--accent)] via-[#9c4dff] to-[#ff5089] rounded-full blur-[140px] mix-blend-multiply opacity-25 animate-pulse-slow" />
+        </div>
+
+        {/* Dot grid — same as features section */}
+        <div
+          className="absolute inset-0 opacity-[0.025] pointer-events-none"
           style={{
-            background: useMotionTemplate`radial-gradient(600px circle at ${springX}px ${springY}px, rgba(34, 211, 238, 0.08), transparent 80%)`
+            backgroundImage: `radial-gradient(circle at 1px 1px, #1D1D1F 1px, transparent 0)`,
+            backgroundSize: '32px 32px',
           }}
         />
-        <div 
-          className="absolute inset-0 opacity-[0.03] z-0 pointer-events-none"
-          style={{
-            backgroundImage: `linear-gradient(to right, #ffffff 1px, transparent 1px), linear-gradient(to bottom, #ffffff 1px, transparent 1px)`,
-            backgroundSize: '40px 40px'
-          }}
-        />
-        
-        <div className="relative max-w-md mx-auto z-10">
-          
+
+        {/* Content — matching home hero layout exactly */}
+        <div className="relative z-10 px-16 max-w-2xl w-full">
+          {/* Pill badge */}
+          <motion.span
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.15 }}
+            className="inline-block mb-8 px-4 py-1.5 text-xs font-semibold tracking-widest uppercase text-[var(--accent)] bg-[var(--accent)]/10 rounded-full border border-[var(--accent)]/20"
+          >
+            Community-Powered Critique Platform
+          </motion.span>
+
+          {/* Large title words */}
+          <h1 className="text-6xl lg:text-7xl font-extrabold mb-8 leading-[1.0] tracking-tight flex flex-wrap gap-x-3">
+            {titleWords.map((word, i) => (
+              <motion.span
+                key={i}
+                initial={{ opacity: 0, y: 40, filter: "blur(10px)" }}
+                animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+                transition={{ type: "spring", stiffness: 100, damping: 15, delay: 0.1 + i * 0.08 }}
+                className="bg-clip-text text-transparent bg-gradient-to-b from-gray-900 via-gray-700 to-gray-500"
+              >
+                {word}
+              </motion.span>
+            ))}
+          </h1>
+
+          {/* Subtitle */}
+          <motion.p
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.55 }}
+            className="text-lg text-gray-500 leading-relaxed font-medium max-w-lg"
+          >
+            Connect your ideas with verified domain experts. Receive precise, structured feedback that transforms your work from good to exceptional.
+          </motion.p>
+
+          {/* 3 mini stats — adds context substance */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.8 }}
+            className="mt-14 flex gap-10"
+          >
+            {[
+              { value: '500+', label: 'Reviews given' },
+              { value: '8', label: 'Expert domains' },
+              { value: '100%', label: 'Honest feedback' },
+            ].map(stat => (
+              <div key={stat.label}>
+                <div className="text-2xl font-bold text-[var(--text-on-light)]">{stat.value}</div>
+                <div className="text-xs text-gray-400 mt-0.5 tracking-wide">{stat.label}</div>
+              </div>
+            ))}
+          </motion.div>
+        </div>
+      </div>
+
+      {/* ─── RIGHT PANEL: Auth form ────────────────────────────── */}
+      <div
+        data-lenis-prevent="true"
+        className="w-full lg:w-[45%] flex items-center justify-center p-6 sm:p-12 pt-32 lg:pt-28 pb-10 relative z-10 overflow-y-auto max-h-screen bg-[var(--surface-light)]"
+      >
+        {/* Light subtle border separator on desktop */}
+        <div className="hidden lg:block absolute left-0 top-16 bottom-16 w-px bg-gradient-to-b from-transparent via-gray-200 to-transparent" />
+
+        <div className="w-full max-w-md">
           {/* Tab Switcher */}
-          <div className="flex p-1 mb-8 bg-[#0a0a0f] rounded-full border border-[rgba(255,255,255,0.06)] shadow-xl w-3/4 mx-auto relative z-20">
+          <div className="flex p-1 mb-10 bg-gray-100 rounded-full w-full relative z-20 border border-gray-200">
             {['Log In', 'Sign Up'].map((tab) => {
               const isActive = (tab === 'Log In' && isLogin) || (tab === 'Sign Up' && !isLogin);
               return (
                 <button
                   key={tab}
-                  onClick={() => {
-                    setIsLogin(tab === 'Log In');
-                    setError('');
-                  }}
-                  className={`flex-1 py-2 text-sm font-medium rounded-full relative transition-colors duration-300 ${isActive ? 'text-[#050505]' : 'text-gray-400 hover:text-white'}`}
+                  onClick={() => { setIsLogin(tab === 'Log In'); setError(''); }}
+                  className={`flex-1 py-3 text-sm font-semibold rounded-full relative transition-colors duration-300 ${isActive ? 'text-white' : 'text-gray-500 hover:text-gray-800'}`}
                 >
                   {isActive && (
                     <motion.div
-                      layoutId="auth-tab"
-                      className="absolute inset-0 bg-[#22d3ee] rounded-full shadow-[0_0_15px_rgba(34,211,238,0.4)]"
+                      layoutId="auth-tab-apple"
+                      className="absolute inset-0 bg-[var(--text-on-light)] rounded-full shadow-md"
                       transition={{ type: "spring", stiffness: 400, damping: 25 }}
                     />
                   )}
@@ -174,82 +202,62 @@ const SignUp = ({ isLogin: initialIsLogin = false }) => {
             })}
           </div>
 
-          <motion.div
-            id="auth-form"
-            className="bg-[#0a0a0f] rounded-2xl shadow-2xl border border-[rgba(255,255,255,0.06)] overflow-hidden p-8 relative"
-          >
-            {/* Animated Border Glow (Beacon) */}
-            <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-[#22d3ee] to-transparent opacity-50 animate-pulse-slow"></div>
-            
-            {/* Header */}
-            <div className="mb-8 text-center">
-              <h2 className="text-2xl font-bold text-white tracking-tight">
-                {isLogin ? 'Welcome Back' : 'Create Account'}
-              </h2>
-              <p className="text-gray-400 text-sm mt-2">
-                {isLogin ? 'Enter your details to access your dashboard' : 'Join CritiqueConnect as a Professional'}
-              </p>
-            </div>
-            
+          {/* Form Card */}
+          <div className="card-solid-light rounded-3xl p-8 sm:p-10 relative">
+            <h2 className="text-2xl font-bold text-[var(--text-on-light)] tracking-tight mb-1">
+              {isLogin ? 'Welcome Back' : 'Create Account'}
+            </h2>
+            <p className="text-gray-400 text-sm mb-8">
+              {isLogin ? 'Enter your details to access your dashboard' : 'Join CritiqueConnect as a Professional'}
+            </p>
+
             <AnimatePresence mode="wait">
-              <motion.form 
+              <motion.form
                 key={isLogin ? 'login' : 'signup'}
                 variants={containerVariants}
                 initial="hidden"
                 animate="visible"
                 exit={{ opacity: 0, x: -20, transition: { duration: 0.1 } }}
                 onSubmit={handleSubmit}
-                className="space-y-4"
+                className="space-y-2"
               >
-                <div className="space-y-3">
-                  <motion.div variants={itemVariants}>
-                    <FloatingInput id="email" label="Email Address" type="email" value={email} onChange={e => setEmail(e.target.value)} required />
-                  </motion.div>
-                  
-                  <motion.div variants={itemVariants}>
-                    <FloatingInput id="password" label="Password" type="password" value={password} onChange={e => setPassword(e.target.value)} required />
-                  </motion.div>
-                  
-                  {!isLogin && (
-                    <motion.div variants={itemVariants}>
-                      <FloatingInput id="confirm-password" label="Confirm Password" type="password" value={confirmPassword} onChange={e => setConfirmPassword(e.target.value)} required />
-                    </motion.div>
-                  )}
-                </div>
-
+                <motion.div variants={itemVariants}>
+                  <AppleInput id="email" label="Email Address" type="email" value={email} onChange={e => setEmail(e.target.value)} required />
+                </motion.div>
+                <motion.div variants={itemVariants}>
+                  <AppleInput id="password" label="Password" type="password" value={password} onChange={e => setPassword(e.target.value)} required />
+                </motion.div>
                 {!isLogin && (
-                  <motion.div variants={containerVariants} className="space-y-3 pt-2">
+                  <motion.div variants={itemVariants}>
+                    <AppleInput id="confirm-password" label="Confirm Password" type="password" value={confirmPassword} onChange={e => setConfirmPassword(e.target.value)} required />
+                  </motion.div>
+                )}
+                {!isLogin && (
+                  <motion.div variants={containerVariants} className="pt-2">
                     <motion.div variants={itemVariants}>
-                      <FloatingInput id="organization" label="Organization Name" type="text" value={organization} onChange={e => setOrganization(e.target.value)} required />
+                      <AppleInput id="organization" label="Organization Name" type="text" value={organization} onChange={e => setOrganization(e.target.value)} required />
                     </motion.div>
-                    
                     <motion.div variants={itemVariants}>
-                      <FloatingInput id="linkedin" label="LinkedIn Profile URL" type="text" value={linkdedin} onChange={e => setLinkedin(e.target.value)} required />
+                      <AppleInput id="linkedin" label="LinkedIn Profile URL" type="text" value={linkdedin} onChange={e => setLinkedin(e.target.value)} required />
                     </motion.div>
-                    
-                    <motion.div variants={itemVariants} className="space-y-3 pt-2 pb-2">
-                      <label className="block text-gray-400 font-medium text-sm px-1">Expertise Domains</label>
-                      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                    <motion.div variants={itemVariants} className="pt-4 pb-4">
+                      <label className="block text-gray-400 font-medium text-xs mb-3 uppercase tracking-widest">Expertise Domains</label>
+                      <div className="grid grid-cols-3 gap-2">
                         {['Technology', 'Social', 'Business'].map((domain) => {
                           const isChecked = domains.includes(domain.toLowerCase());
                           return (
-                            <motion.label 
+                            <motion.label
                               key={domain}
                               whileHover={{ scale: 1.02 }}
-                              whileTap={{ scale: [1, 0.95, 1.05, 1], transition: { duration: 0.3 } }}
-                              className={`relative p-3 border rounded-xl cursor-pointer flex items-center transition-all duration-300 ${
-                                isChecked ? 'border-[#22d3ee] bg-[#22d3ee]/10' : 'border-[rgba(255,255,255,0.06)] bg-[#0f0f1a] hover:bg-[rgba(255,255,255,0.03)]'
+                              whileTap={{ scale: 0.98 }}
+                              className={`relative p-2.5 border rounded-xl cursor-pointer flex flex-col items-center text-center transition-all duration-200 ${
+                                isChecked
+                                  ? 'border-[var(--accent)] bg-[var(--accent)]/8 shadow-sm'
+                                  : 'border-gray-200 hover:border-gray-300 bg-white'
                               }`}
                             >
                               <input type="checkbox" value={domain.toLowerCase()} checked={isChecked} onChange={handleDomainChange} className="sr-only" />
-                              <div className={`w-4 h-4 mr-3 flex-shrink-0 flex items-center justify-center border rounded transition-colors ${
-                                isChecked ? 'border-[#22d3ee] bg-[#22d3ee]' : 'border-gray-500'
-                              }`}>
-                                {isChecked && (
-                                  <svg className="w-3 h-3 text-[#050505]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" /></svg>
-                                )}
-                              </div>
-                              <span className={`text-sm ${isChecked ? 'text-white' : 'text-gray-400'}`}>{domain}</span>
+                              <span className={`text-xs font-semibold ${isChecked ? 'text-[var(--accent)]' : 'text-gray-500'}`}>{domain}</span>
                             </motion.label>
                           );
                         })}
@@ -261,43 +269,38 @@ const SignUp = ({ isLogin: initialIsLogin = false }) => {
                 <AnimatePresence>
                   {error && (
                     <motion.div
-                      initial={{ opacity: 0, height: 0 }}
-                      animate={{ opacity: 1, height: 'auto' }}
-                      exit={{ opacity: 0, height: 0 }}
-                      className="p-3 bg-red-500/10 border border-red-500/20 text-red-400 text-sm rounded-lg text-center font-medium"
+                      initial={{ opacity: 0, y: -10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -10 }}
+                      className="p-3 bg-red-50 text-red-500 text-sm rounded-xl text-center font-medium border border-red-100"
                     >
                       {error}
                     </motion.div>
                   )}
                 </AnimatePresence>
 
-                <motion.div variants={itemVariants} className="pt-4">
-                  <motion.button
+                <motion.div variants={itemVariants} className="pt-6">
+                  <button
                     type="submit"
                     disabled={loading}
-                    className="relative w-full py-3 px-6 bg-[#22d3ee] text-[#050505] font-semibold rounded-lg overflow-hidden group disabled:opacity-70 disabled:cursor-not-allowed"
-                    whileTap={loading ? {} : { scale: 0.98 }}
+                    className="btn-apple w-full !py-4 shadow-lg shadow-[var(--accent)]/20 text-base disabled:opacity-70 disabled:cursor-not-allowed"
                   >
-                    <div className="absolute inset-0 bg-[#67e8f9] opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                    <div className="relative z-10 flex items-center justify-center">
-                      {loading ? (
-                        <svg className="animate-spin h-5 w-5 text-[#050505]" fill="none" viewBox="0 0 24 24">
-                          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                        </svg>
-                      ) : (
-                        <span>{isLogin ? 'Log In to Account' : 'Complete Registration'}</span>
-                      )}
-                    </div>
-                  </motion.button>
+                    {loading ? (
+                      <svg className="animate-spin h-5 w-5 text-white" fill="none" viewBox="0 0 24 24">
+                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                      </svg>
+                    ) : (
+                      <span>{isLogin ? 'Log In' : 'Create Account'}</span>
+                    )}
+                  </button>
                 </motion.div>
               </motion.form>
             </AnimatePresence>
-          </motion.div>
+          </div>
         </div>
       </div>
-      <Footer />
-    </>
+    </div>
   );
 };
 

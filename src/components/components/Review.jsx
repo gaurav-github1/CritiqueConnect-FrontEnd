@@ -231,7 +231,7 @@ const Review = () => {
               </div>
               
               {/* Modal Content */}
-              <div className="p-6 overflow-y-auto flex-1 bg-[#050505]">
+              <div className="p-6 overflow-y-auto flex-1 bg-[#050505]" data-lenis-prevent="true">
                 
                 {/* AI Summary Section */}
                 {summaryLoading ? (

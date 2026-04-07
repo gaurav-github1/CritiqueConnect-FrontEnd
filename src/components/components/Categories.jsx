@@ -2,18 +2,17 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence, useMotionValue, useSpring, useTransform, useMotionTemplate } from 'framer-motion';
 import Navbar from './Navbar';
-import Footer from './Footer';
 
 // Define domain-specific colors for the glow
 const domainColors = {
-  'Technology': '#22d3ee', // Cyan
-  'Business': '#4ade80',   // Green
-  'Science': '#60a5fa',    // Blue
-  'Art': '#f472b6',        // Pink
-  'Education': '#fbbf24',  // Amber
-  'Health': '#f87171',     // Red
-  'Social': '#c084fc',     // Purple
-  'Other': '#a3a3a3'       // Gray
+  'Technology': '#0A84FF', // Apple Blue
+  'Business': '#30D158',   // Apple Green
+  'Science': '#5E5CE6',    // Apple Indigo
+  'Art': '#FF2D55',        // Apple Pink
+  'Education': '#FF9F0A',  // Apple Orange
+  'Health': '#FF3B30',     // Apple Red
+  'Social': '#BF5AF2',     // Apple Purple
+  'Other': '#8E8E93'       // Apple Gray
 };
 
 export default function CategoriesPage() {
@@ -46,20 +45,20 @@ export default function CategoriesPage() {
   return (
     <>
       <Navbar />
-      <div className="relative min-h-screen bg-[#050505] pt-32 pb-16 px-4 sm:px-6 lg:px-8 overflow-hidden font-ui">
+      <div className="relative min-h-screen bg-[var(--surface-dark)] pt-32 pb-16 px-4 sm:px-6 lg:px-8 overflow-hidden font-ui">
         
         {/* Spotlight Grid Overlay */}
         <motion.div 
           className="absolute inset-0 z-0 pointer-events-none"
           style={{
-            background: useMotionTemplate`radial-gradient(800px circle at ${springX}px ${springY}px, rgba(34, 211, 238, 0.08), transparent 80%)`
+            background: useMotionTemplate`radial-gradient(1000px circle at ${springX}px ${springY}px, rgba(10, 132, 255, 0.08), transparent 70%)`
           }}
         />
         <div 
-          className="absolute inset-0 opacity-[0.03] z-0 pointer-events-none"
+          className="absolute inset-0 opacity-[0.02] z-0 pointer-events-none"
           style={{
             backgroundImage: `linear-gradient(to right, #ffffff 1px, transparent 1px), linear-gradient(to bottom, #ffffff 1px, transparent 1px)`,
-            backgroundSize: '40px 40px',
+            backgroundSize: '60px 60px',
           }}
         />
         
@@ -106,14 +105,14 @@ export default function CategoriesPage() {
                 className="mt-16 flex justify-center fixed bottom-10 left-0 right-0 z-50 pointer-events-none"
               >
                 <div className="pointer-events-auto relative group">
-                  <div className="absolute -inset-1 bg-[#22d3ee] rounded-full blur-lg opacity-40 group-hover:opacity-70 transition duration-300"></div>
+                  <div className="absolute -inset-1 bg-[var(--accent)] rounded-full blur-lg opacity-40 group-hover:opacity-70 transition duration-300"></div>
                   <button
                     onClick={handleProceed}
-                    className="relative px-8 py-4 bg-[#0a0a0f] text-[#22d3ee] font-semibold rounded-full border border-[#22d3ee]/50 hover:bg-[#22d3ee]/10 transition-colors flex items-center shadow-2xl"
+                    className="relative px-8 py-4 glass-dark specular-highlight text-[var(--accent)] font-semibold rounded-full border-0 ring-1 ring-[var(--accent)]/50 hover:bg-[var(--accent)]/10 transition-colors flex items-center shadow-2xl"
                   >
                     <span>Proceed with {selectedCategory}</span>
                     <svg className="w-5 h-5 ml-2 transform group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M14 5l7 7m0 0l-7 7m7-7H3" />
                     </svg>
                   </button>
                 </div>
@@ -122,7 +121,6 @@ export default function CategoriesPage() {
           </AnimatePresence>
         </div>
       </div>
-      <Footer />
     </>
   );
 }
@@ -153,7 +151,7 @@ const CategoryCard = ({ cat, isSelected, onClick, color, index }) => {
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: index * 0.05, type: 'spring' }}
-      className="perspective-[1000px] animate-float-bob"
+      className="perspective-[1000px] animate-float"
       style={{ animationDelay: `${index * 0.15}s` }}
     >
       <motion.div
@@ -162,13 +160,12 @@ const CategoryCard = ({ cat, isSelected, onClick, color, index }) => {
         onMouseLeave={handleMouseLeave}
         onClick={onClick}
         whileTap={{ scale: 0.95 }}
-        style={{ rotateX, rotateY, transformStyle: "preserve-3d" }}
-        className={`relative cursor-pointer p-6 rounded-2xl backdrop-blur-md shadow-lg border overflow-visible h-full flex flex-col items-center justify-center transition-all duration-300 ${
+        style={{ rotateX, rotateY, transformStyle: "preserve-3d", '--tw-ring-color': isSelected ? color : 'transparent' }}
+        className={`relative cursor-pointer p-6 rounded-3xl glass-dark specular-highlight overflow-hidden h-full flex flex-col items-center justify-center transition-all duration-300 ${
           isSelected 
-            ? 'bg-[#12121a]' 
-            : 'bg-[#0a0a0f] border-[rgba(255,255,255,0.06)] hover:bg-[rgba(255,255,255,0.03)]'
+            ? 'bg-white/10 ring-2' 
+            : 'hover:bg-white/5 border-0 text-white'
         }`}
-        style={{ borderColor: isSelected ? color : 'rgba(255,255,255,0.06)' }}
       >
         {/* Glow Bloom behind card when selected */}
         <div 

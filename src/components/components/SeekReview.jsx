@@ -3,7 +3,6 @@ import axios from 'axios';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import Navbar from './Navbar';
-import Footer from './Footer';
 import { motion, AnimatePresence, useMotionValue, useSpring, useMotionTemplate } from 'framer-motion';
 
 const ProjectForm = () => {
@@ -287,7 +286,6 @@ const ProjectForm = () => {
           </AnimatePresence>
         </div>
       </div>
-      <Footer />
     </>
   );
 };
