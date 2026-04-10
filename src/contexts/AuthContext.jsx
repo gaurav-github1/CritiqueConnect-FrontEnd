@@ -1,9 +1,4 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
-import { 
-  onAuthStateChanged, 
-  signOut as firebaseSignOut 
-} from 'firebase/auth';
-import { auth } from '../Utils/firebase';
 
 // Create the Auth Context
 const AuthContext = createContext();
@@ -13,29 +8,35 @@ export const AuthProvider = ({ children }) => {
   const [currentUser, setCurrentUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  // Sign out function
-  const signOut = async () => {
-    try {
-      await firebaseSignOut(auth);
-    } catch (error) {
-      console.error('Error signing out:', error);
+  // Initialize from storage
+  useEffect(() => {
+    const storedUser = localStorage.getItem('currentUser');
+    if (storedUser) {
+      try {
+        setCurrentUser(JSON.parse(storedUser));
+      } catch (e) {
+        console.error('Error parsing stored user:', e);
+      }
     }
+    setLoading(false);
+  }, []);
+
+  // Login function
+  const login = (user) => {
+    setCurrentUser(user);
+    localStorage.setItem('currentUser', JSON.stringify(user));
   };
 
-  // Subscribe to auth state changes
-  useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
-      setCurrentUser(user);
-      setLoading(false);
-    });
-
-    // Cleanup subscription
-    return unsubscribe;
-  }, []);
+  // Sign out function
+  const signOut = async () => {
+    setCurrentUser(null);
+    localStorage.removeItem('currentUser');
+  };
 
   // Context value
   const value = {
     currentUser,
+    login,
     signOut,
     loading
   };

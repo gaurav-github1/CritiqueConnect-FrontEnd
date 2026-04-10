@@ -1,9 +1,8 @@
 import React, { useState } from 'react';
-import { signInWithEmailAndPassword, createUserWithEmailAndPassword } from "firebase/auth";
-import { auth } from "../Utils/firebase";
 import Navbar from './components/Navbar';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useAuth } from '../contexts/AuthContext';
 
 // Apple floating-label input — light theme
 const AppleInput = ({ id, label, type, value, onChange, required }) => (
@@ -39,6 +38,7 @@ const SignUp = ({ isLogin: initialIsLogin = false }) => {
   const [loading, setLoading] = useState(false);
 
   const navigate = useNavigate();
+  const { login } = useAuth();
   const location = useLocation();
   const from = location.state?.from || '/dashboard';
 
@@ -63,27 +63,49 @@ const SignUp = ({ isLogin: initialIsLogin = false }) => {
     setLoading(true);
     try {
       if (isLogin) {
-        await signInWithEmailAndPassword(auth, email, password);
-        navigate(from);
+        const response = await fetch('https://critiquebackend.onrender.com/user/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, password }),
+        });
+        
+        if (response.ok) {
+          const data = await response.json();
+          login(data.user || { email });
+          navigate(from);
+        } else {
+          setError('Invalid email or password.');
+        }
       } else {
         if (password !== confirmPassword) { setError('Passwords do not match.'); setLoading(false); return; }
-        await createUserWithEmailAndPassword(auth, email, password);
-        if (userType === 'professional' && organization && domains.length > 0 && linkdedin) {
-          const response = await fetch('https://critiquebackend.onrender.com/user/signup', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ email, OrganisationName: organization, domains, linkedin: linkdedin, role: 'professional' }),
-          });
-          if (response.ok) { navigate('/dashboard', { state: { email } }); }
-          else { setError('Failed to save professional data. Please try again.'); }
-        } else {
+        
+        const payload = { 
+          email, 
+          password,
+          OrganisationName: organization || "Unknown", 
+          domains: domains.length > 0 ? domains : ["General"], 
+          linkedin: linkdedin || "", 
+          role: 'professional' 
+        };
+        
+        const response = await fetch('https://critiquebackend.onrender.com/user/signup', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload),
+        });
+        
+        if (response.ok) {
+          const data = await response.json();
+          login(data.user || { email });
           navigate('/dashboard', { state: { email } });
+        } else {
+           const errData = await response.json().catch(() => ({}));
+           setError(errData.message || 'Failed to create account. Please try again.');
         }
       }
     } catch (err) {
-      if (err.code === 'auth/email-already-in-use') setError('Email is already in use.');
-      else if (err.code === 'auth/wrong-password' || err.code === 'auth/user-not-found') setError('Invalid email or password.');
-      else setError('An error occurred. Please try again.');
+      console.error(err);
+      setError('A network error occurred. Please try again.');
     } finally {
       setLoading(false);
     }
