@@ -83,7 +83,7 @@ const SignUp = ({ isLogin: initialIsLogin = false }) => {
           email, 
           password,
           OrganisationName: organization || "Unknown", 
-          domains: domains.length > 0 ? domains : ["General"], 
+          domains: domains.length > 0 ? domains : ["technology"], 
           linkedin: linkdedin || "", 
           role: 'professional' 
         };
@@ -100,7 +100,7 @@ const SignUp = ({ isLogin: initialIsLogin = false }) => {
           navigate('/dashboard', { state: { email } });
         } else {
            const errData = await response.json().catch(() => ({}));
-           setError(errData.message || 'Failed to create account. Please try again.');
+           setError(errData.error || errData.message || 'Failed to create account. Please try again.');
         }
       }
     } catch (err) {
@@ -265,11 +265,15 @@ const SignUp = ({ isLogin: initialIsLogin = false }) => {
                     <motion.div variants={itemVariants} className="pt-4 pb-4">
                       <label className="block text-gray-400 font-medium text-xs mb-3 uppercase tracking-widest">Expertise Domains</label>
                       <div className="grid grid-cols-3 gap-2">
-                        {['Technology', 'Social', 'Business'].map((domain) => {
-                          const isChecked = domains.includes(domain.toLowerCase());
+                        {[
+                          { label: 'Technology', value: 'technology' },
+                          { label: 'Social', value: 'social' },
+                          { label: 'Business', value: 'Business' }
+                        ].map((domain) => {
+                          const isChecked = domains.includes(domain.value);
                           return (
                             <motion.label
-                              key={domain}
+                              key={domain.label}
                               whileHover={{ scale: 1.02 }}
                               whileTap={{ scale: 0.98 }}
                               className={`relative p-2.5 border rounded-xl cursor-pointer flex flex-col items-center text-center transition-all duration-200 ${
@@ -278,8 +282,8 @@ const SignUp = ({ isLogin: initialIsLogin = false }) => {
                                   : 'border-gray-200 hover:border-gray-300 bg-white'
                               }`}
                             >
-                              <input type="checkbox" value={domain.toLowerCase()} checked={isChecked} onChange={handleDomainChange} className="sr-only" />
-                              <span className={`text-xs font-semibold ${isChecked ? 'text-[var(--accent)]' : 'text-gray-500'}`}>{domain}</span>
+                              <input type="checkbox" value={domain.value} checked={isChecked} onChange={handleDomainChange} className="sr-only" />
+                              <span className={`text-xs font-semibold ${isChecked ? 'text-[var(--accent)]' : 'text-gray-500'}`}>{domain.label}</span>
                             </motion.label>
                           );
                         })}
