@@ -260,7 +260,7 @@ const Review = () => {
                     <div className="mt-6 bg-[#0a0a0f] p-6 rounded-xl border border-[rgba(255,255,255,0.06)] relative group">
                       <h4 className="font-bold text-white mb-4 flex items-center text-lg">
                         <svg className="h-5 w-5 mr-2 text-[#22d3ee]" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
-                        Grok Aggregation
+                        GPT review
                       </h4>
                       <p className="text-gray-300 leading-relaxed text-sm format-quote">{summaryData.overall_summary}</p>
                     </div>
