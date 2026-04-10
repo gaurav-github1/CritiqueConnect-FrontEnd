@@ -58,8 +58,17 @@ function ProvideReview() {
       });
       setTasks(taskList);
     } catch (error) {
-      const errMsg = error.response ? (error.response.status === 404 ? `User not found or not registered as a provider.` : `Server error: ${error.response.status}.`) : 'Error fetching tasks.';
-      setError(errMsg);
+      const backendMsg = error.response?.data?.message || error.response?.data?.error;
+      const errMsg = backendMsg || (error.response?.status === 404 ? 'No tasks found or provider not yet registered.' : `Server error: ${error.response?.status}.`) || 'Error fetching tasks.';
+      
+      if (error.response?.status === 404 && !backendMsg) {
+        // If it's a 404 with no specific message, it often just means no tasks are in the queue.
+        // We can just leave tasks empty and avoid a scary red error.
+        setTasks([]);
+        setError('');
+      } else {
+        setError(errMsg);
+      }
     } finally {
       setLoading(false);
     }
